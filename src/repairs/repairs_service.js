@@ -23,4 +23,12 @@ export class RepairService {
         })
     }
 
+    async updateRepair(repair) {
+        return await repair.update({ status: 'completed' })
+    }
+
+    async deleteRepair(repair) {
+        return await repair.update({ status: 'canceled' })
+    }
+
 }

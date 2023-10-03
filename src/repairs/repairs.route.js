@@ -2,7 +2,9 @@ import { Router } from "express";
 import {
     createRepair,
     findOne,
-    findPending
+    findPending,
+    deleteRepair,
+    updateRepair
 } from './repairs.controller.js'
 
 export const router = Router()
@@ -13,3 +15,5 @@ router.route('/')
 
 router.route('/:id')
     .get(findOne)
+    .patch(updateRepair)
+    .delete(deleteRepair)
