@@ -13,6 +13,15 @@ const Repairs = sequelize.define('repairs', {
         type: DataTypes.DATE,
         allowNull: false
     },
+    motorsNumber: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        field: "Motors_number"
+    },
+    description: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
     status: {
         type: DataTypes.ENUM('pending', 'completed', 'canceled'),
         allowNull: false,

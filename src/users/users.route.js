@@ -4,20 +4,37 @@ import {
     createUser,
     findOneUser,
     deleteUser,
-    updateUser
+    updateUser,
+    register,
+    login,
+    changePassword
 } from './users.controller.js'
+
+import { protect, validateExistUser } from './users.middleware.js'
 
 export const router = Router()
 
+router.use(protect)
+
+router.post('/login', login)
+
+router.post('/register', register)
+
+router.patch('/change-password', protect, changePassword)
+
 router
-    .route('/users')
-    .get(findAllUsers)
+    .route('/')
+    .get(protect, findAllUsers)
     .post(createUser)
 
 router
-    .route('/users/:id')
+    .use('/:id', validateExistUser)
+    .route('/:id')
     .get(findOneUser)
     .patch(updateUser)
     .delete(deleteUser)
+
+
+
 
 

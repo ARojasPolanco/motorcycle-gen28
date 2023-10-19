@@ -25,4 +25,30 @@ export class UserService {
     async deleteUser(user) {
         return await user.update({ status: false })
     }
+
+    async login(email) {
+        return await User.findOne({
+            where: {
+                email: email,
+                status: true
+            }
+        })
+    }
+
+    async createUsers(data) {
+        return await User.create(data)
+    }
+
+    async updatePassword(user, data) {
+        return await user.update(data)
+    }
+
+    async findOneLogginUser(id) {
+        return await User.findOne({
+            where: {
+                id: id,
+                status: true
+            }
+        })
+    }
 } 
