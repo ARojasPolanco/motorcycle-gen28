@@ -2,7 +2,7 @@ import z from 'zod'
 import { extractValidationData } from '../common/utils/extractErrordata.js'
 
 export const repairSchema = z.object({
-    date: z.date({
+    date: z.string({
         invalid_type_error: "Date must be a correct format",
         required_error: "Date is required"
     }),
@@ -13,12 +13,11 @@ export const repairSchema = z.object({
     description: z.string({
         invalid_type_error: "Description be a correct format",
         required_error: "Description is required"
-    }).min(5).max(200),
-    status: z.enum(['pending', 'completed', 'canceled'])
+    }).min(5).max(200)
 })
 
 export function validateRepair(data) {
-    const result = userSchema.safeParse(data)
+    const result = repairSchema.safeParse(data)
 
     const {
         hasError,
@@ -35,7 +34,7 @@ export function validateRepair(data) {
 
 
 export function validatePartialRepair(data) {
-    const result = userSchema.partial().safeParse(data)
+    const result = repairSchema.partial().safeParse(data)
 
     const {
         hasError,
