@@ -1,107 +1,75 @@
+import { AppError } from "../error/appError.js"
+import { catchAsync } from "../error/catchAsync.js"
 import { validatePartialRepair, validateRepair } from "./repair.schema.js"
 import { RepairService } from "./repairs_service.js"
 
 const repairService = new RepairService()
 
-export const findPending = async (_, res) => {
+export const findPending = catchAsync(async (_, res, next) => {
+    const repair = await repairService.findPending()
+    return res.json(repair)
+})
 
-    try {
-        const repair = await repairService.findPending()
-        return res.json(repair)
-    } catch (error) {
-        return res.status(500).json(error)
+export const createRepair = catchAsync(async (req, res, next) => {
+    const { hasError, errorMessages, repairData } = validateRepair(req.body)
+
+    if (hasError) {
+        return res.status(422).json({
+            status: 'error',
+            message: errorMessages
+        })
     }
-}
 
-export const createRepair = async (req, res) => {
+    const repair = await repairService.createRepair(repairData)
 
-    try {
+    return res.status(201).json(repair)
+})
 
-        const { hasError, errorMessages, repairData } = validateRepair(req.body)
+export const findOne = catchAsync(async (req, res, next) => {
+    const { id } = req.params
 
-        if (hasError) {
-            return res.status(422).json({
-                status: 'error',
-                message: errorMessages
-            })
-        }
+    const repair = await repairService.findOneRepair(id)
 
-        const repair = await repairService.createRepair(repairData)
-
-        return res.status(201).json(repair)
-    } catch (error) {
-        return res.status(500).json(error)
+    if (!repair) {
+        return next(new AppError(`Repair whit id ${id} not found`, 404))
     }
-}
 
-export const findOne = async (req, res) => {
+    return res.json(repair)
+})
 
-    try {
-        const { id } = req.params
+export const updateRepair = catchAsync(async (req, res, next) => {
+    const { hasError, errorMessages, dataRepair } = validatePartialRepair(req.body)
 
-        const repair = await repairService.findOneRepair(id)
-
-        if (!repair) {
-            return res.status(404).json({
-                status: 'error',
-                message: `Repair whit id ${id} not found`
-            })
-        }
-
-        return res.json(repair)
-    } catch (error) {
-        return res.status(500).json(error)
+    if (hasError) {
+        return res.status(422).json({
+            status: 'error',
+            message: errorMessages
+        })
     }
-}
 
-export const updateRepair = async (req, res) => {
-    try {
+    const { id } = req.params
 
-        const { hasError, errorMessages, dataRepair } = validatePartialRepair(req.body)
+    const repair = await repairService.findOneRepair(id)
 
-        if (hasError) {
-            return res.status(422).json({
-                status: 'error',
-                message: errorMessages
-            })
-        }
-
-        const { id } = req.params
-
-        const repair = await repairService.findOneRepair(id)
-
-        if (!repair) {
-            return res.status(404).json({
-                status: 'error',
-                message: `Repair whit id ${id} not found`
-            })
-        }
-
-        const updateRepair = await repairService.updateRepair(repair, dataRepair)
-
-        return res.json(updateRepair)
-    } catch (error) {
-        return res.status(500).json(error)
+    if (!repair) {
+        return next(new AppError(`Repair whit id ${id} not found`, 404))
     }
-}
 
-export const deleteRepair = async (req, res) => {
-    try {
-        const { id } = req.params
+    const updateRepair = await repairService.updateRepair(repair, dataRepair)
 
-        const repair = await repairService.findOneRepair(id)
+    return res.json(updateRepair)
+})
 
-        if (!repair) {
-            return res.status(404).json({
-                status: 'error',
-                message: `Repair whit id ${id} not found`
-            })
-        }
+export const deleteRepair = catchAsync(async (req, res, next) => {
+    const { id } = req.params
 
-        await repairService.deleteRepair(repair)
+    const repair = await repairService.findOneRepair(id)
 
-        return res.status(204).json(null)
-    } catch (error) {
-        return res.status(500).json(error)
+    if (!repair) {
+        return next(new AppError(`Repair whit id ${id} not found`, 404))
     }
-}
+
+    await repairService.deleteRepair(repair)
+
+    return res.status(204).json(null)
+})

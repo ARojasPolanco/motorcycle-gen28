@@ -1,4 +1,5 @@
 import { envs } from "../config/env/envitoments.js";
+import { AppError } from "../error/appError.js";
 import { UserService } from "./users_service.js";
 import jwt from 'jsonwebtoken'
 import { promisify } from 'util'
@@ -12,10 +13,7 @@ export const validateExistUser = async (req, res, next) => {
     const user = await userService.findOneUser(id)
 
     if (!user) {
-        return res.status(404).json({
-            status: 'error',
-            message: `User whit id ${id} not found`
-        })
+        return next(new AppError(`User whit id ${id} not found`, 404))
     }
 
     req.user = user
@@ -35,10 +33,7 @@ export const protect = async (req, res, next) => {
     }
 
     if (!token) {
-        return res.status(401).json({
-            status: 'error',
-            message: 'You are not logged in, please log in to get access'
-        })
+        return next(new AppError('You are not logged in, please log in to get access', 401))
     }
 
     const decoded = await promisify(jwt.verify)(
@@ -49,10 +44,7 @@ export const protect = async (req, res, next) => {
     const user = await userService.findOneLogginUser(decoded.id)
 
     if (!user) {
-        return res.status(401).json({
-            status: 'error',
-            message: 'The owner of this token is not longer available'
-        })
+        return next(new AppError('The owner of this token is not longer available', 401))
     }
 
     req.sessionUser = user;
@@ -64,10 +56,7 @@ export const restrictTo = (...roles) => {
 
     return (req, res, next) => {
         if (!roles.includes(req.sessionUser.role)) {
-            return res.status(403).json({
-                status: 'error',
-                message: 'You do not have permission to perform this action'
-            })
+            return next(new AppError('You do not have permission to perform this action', 403))
         }
         next()
     }
