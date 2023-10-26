@@ -61,3 +61,14 @@ export const restrictTo = (...roles) => {
         next()
     }
 }
+
+export const protectAccountOwner = (req, res, next) => {
+
+    const { user, sessionUser } = req;
+
+    if (user.id !== sessionUser.id) {
+        return next(new AppError('You do not have permissions for this action', 401))
+    }
+
+    next()
+}

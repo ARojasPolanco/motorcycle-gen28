@@ -10,7 +10,7 @@ import {
     changePassword
 } from './users.controller.js'
 
-import { protect, validateExistUser } from './users.middleware.js'
+import { protect, protectAccountOwner, validateExistUser } from './users.middleware.js'
 
 export const router = Router()
 
@@ -31,8 +31,8 @@ router
     .use('/:id', validateExistUser)
     .route('/:id')
     .get(findOneUser)
-    .patch(updateUser)
-    .delete(deleteUser)
+    .patch(protect, protectAccountOwner, updateUser)
+    .delete(protect, validateExistUser, protectAccountOwner, deleteUser)
 
 
 

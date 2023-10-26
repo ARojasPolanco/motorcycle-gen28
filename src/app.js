@@ -2,7 +2,7 @@ import express from "express";
 import { router } from "./routes/routes.js";
 import { AppError } from "./error/appError.js";
 import { envs } from "./config/env/envitoments.js";
-import { goblarErrorHandler } from "./error/error.controller.js";
+import { globalErrorHandler } from "./error/error.controller.js";
 import { enableCors } from "./config/plugins/cors.plugin.js";
 import { enableMorgan } from "./config/plugins/morgan.plugin.js";
 
@@ -24,6 +24,6 @@ app.all('*', (req, res, next) => {
     next(new AppError(`Can't find ${req.originalUrl} on this server`, 404))
 })
 
-app.use(goblarErrorHandler)
+app.use(globalErrorHandler)
 
 export default app;  
